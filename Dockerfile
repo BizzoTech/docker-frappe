@@ -1,4 +1,4 @@
-FROM bizzotech/frappe-base
+FROM bizzotech/frappe-base:latest
 MAINTAINER Emad Shaaban <emad@bizzotech.com>
 
 # Update
@@ -15,7 +15,7 @@ WORKDIR /home/$FRAPPE_USER
 RUN git clone -b $BENCH_BRANCH --depth 1 https://github.com/$FRAPPE_USER/bench bench-repo && \
     sudo pip install -e /home/$FRAPPE_USER/bench-repo --no-cache-dir && \
     mkdir -p frappe-bench && cd frappe-bench && \
-    mkdir -p apps logs sites/localhost config && \
+    mkdir -p apps logs sites config && \
     bench setup env && \
     sudo bench setup sudoers $FRAPPE_USER && \
     bench setup socketio && \
@@ -31,7 +31,6 @@ ADD ./docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN sudo chmod +x /usr/local/bin/docker-entrypoint.sh
 
 VOLUME /home/$FRAPPE_USER/frappe-bench/logs
-VOLUME /home/$FRAPPE_USER/frappe-bench/sites/localhost
 
 WORKDIR /home/$FRAPPE_USER/frappe-bench
 
