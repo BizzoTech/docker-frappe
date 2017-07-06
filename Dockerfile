@@ -4,7 +4,7 @@ MAINTAINER Emad Shaaban <emad@bizzotech.com>
 # Update
 ENV FRAPPE_USER frappe
 ENV BENCH_BRANCH master
-ENV FRAPPE_BRANCH v8.2.7
+ENV FRAPPE_BRANCH v8.3.0
 
 RUN addgroup -S $FRAPPE_USER && \
     adduser -D -G $FRAPPE_USER $FRAPPE_USER && \
