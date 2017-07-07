@@ -7,6 +7,7 @@ bench use localhost
 
 TASK=$(case "$NODE_TYPE" in
   ("app") echo "/home/frappe/frappe-bench/env/bin/gunicorn -b 0.0.0.0:8000 -w 4 -t 120 frappe.app:application --preload" ;;
+  ("update") echo "/usr/bin/bench update --no-git" ;;
   ("scheduler") echo "/usr/bin/bench schedule" ;;
   ("worker-default") echo "/usr/bin/bench worker --queue default" ;;
   ("worker-long") echo "/usr/bin/bench worker --queue long" ;;
@@ -34,6 +35,14 @@ if [ ${NODE_TYPE} = "app" ]; then
   fi;
 
   cd /home/frappe/frappe-bench/sites
+
+fi;
+
+if [ ${NODE_TYPE} = "update" ]; then
+
+  echo 'Waiting for DB to start up'
+
+  dockerize -wait tcp://db:3306 -timeout 120s
 
 fi;
 

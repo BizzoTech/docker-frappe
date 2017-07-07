@@ -4,7 +4,7 @@ MAINTAINER Emad Shaaban <emad@bizzotech.com>
 # Update
 ENV FRAPPE_USER frappe
 ENV BENCH_BRANCH master
-ENV FRAPPE_BRANCH v8.3.0
+ENV FRAPPE_BRANCH v8.3.1
 
 RUN addgroup -S $FRAPPE_USER && \
     adduser -D -G $FRAPPE_USER $FRAPPE_USER && \
@@ -12,7 +12,7 @@ RUN addgroup -S $FRAPPE_USER && \
 
 USER $FRAPPE_USER
 WORKDIR /home/$FRAPPE_USER
-RUN git clone -b $BENCH_BRANCH --depth 1 https://github.com/$FRAPPE_USER/bench bench-repo && \
+RUN git clone -b $BENCH_BRANCH --depth 1 https://github.com/BizzoTech/bench bench-repo && \
     sudo pip install -e /home/$FRAPPE_USER/bench-repo --no-cache-dir && \
     mkdir -p frappe-bench && cd frappe-bench && \
     mkdir -p apps logs sites config && \
