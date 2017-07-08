@@ -30,7 +30,7 @@ if [ ${NODE_TYPE} = "app" ]; then
 
     cd /home/frappe/frappe-bench
     bench reinstall && \
-    bench install-app erpnext
+    ls apps/ | while read -r file; do  if [ $file != "frappe" ]; then bench install-app $file; fi; done
 
   fi;
 
