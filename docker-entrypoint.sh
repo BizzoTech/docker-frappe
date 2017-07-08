@@ -5,9 +5,17 @@ DB_HOST=${DB_HOST:=db}
 
 bench use localhost
 
+echo 'Waiting for DB to start up'
+
+dockerize -wait tcp://db:3306 -timeout 120s
+
+
 TASK=$(case "$NODE_TYPE" in
   ("app") echo "/home/frappe/frappe-bench/env/bin/gunicorn -b 0.0.0.0:8000 -w 4 -t 120 frappe.app:application --preload" ;;
+  ("setup") echo "echo \"Setup Finished \" " ;;
   ("update") echo "/usr/bin/bench update --no-git" ;;
+  ("backup") echo "/usr/bin/bench backup && echo \"Backup Finished \" " ;;
+  ("migrate") echo "/usr/bin/bench migrate" ;;
   ("scheduler") echo "/usr/bin/bench schedule" ;;
   ("worker-default") echo "/usr/bin/bench worker --queue default" ;;
   ("worker-long") echo "/usr/bin/bench worker --queue long" ;;
@@ -16,111 +24,18 @@ TASK=$(case "$NODE_TYPE" in
   (*) ;;
 esac)
 
-if [ ${NODE_TYPE} = "app" ]; then
+if [ ${NODE_TYPE} = "setup" ]; then
 
-  echo 'Waiting for DB to start up'
-
-  dockerize -wait tcp://db:3306 -timeout 120s
-
-  # su frappe -c "bench --site site.local doctor > /dev/null 2>&1"
   cd /home/frappe/frappe-bench
-  bench --site localhost doctor > /dev/null 2>&1
+  bench reinstall && \
+  ls apps/ | while read -r file; do  if [ $file != "frappe" ]; then bench install-app $file; fi; done
 
-  if [ ! $? -eq 0 ]; then
+fi;
 
-    cd /home/frappe/frappe-bench
-    bench reinstall && \
-    ls apps/ | while read -r file; do  if [ $file != "frappe" ]; then bench install-app $file; fi; done
-
-  fi;
+if [ ${NODE_TYPE} = "app" ]; then
 
   cd /home/frappe/frappe-bench/sites
 
 fi;
 
-if [ ${NODE_TYPE} = "update" ]; then
-
-  echo 'Waiting for DB to start up'
-
-  dockerize -wait tcp://db:3306 -timeout 120s
-
-fi;
-
 (eval $TASK | tee /home/frappe/frappe-bench/logs/${NODE_TYPE}.log) 3>&1 1>&2 2>&3 | tee /home/frappe/frappe-bench/logs/${NODE_TYPE}.err.log
-
-# (echo hello | tee stdout.log) 3>&1 1>&2 2>&3 | tee stderr.log
-
-# else
-
-# [program:frappe-bench-frappe-web]
-# command=/home/frappe/frappe-bench/env/bin/gunicorn -b 0.0.0.0:8000 -w 4 -t 120 frappe.app:application --preload
-# priority=4
-# autostart=true
-# autorestart=true
-# stdout_logfile=/home/frappe/frappe-bench/logs/web.log
-# stderr_logfile=/home/frappe/frappe-bench/logs/web.error.log
-# user=frappe
-# directory=/home/frappe/frappe-bench/sites
-
-# [program:frappe-bench-frappe-schedule]
-# command=/usr/bin/bench schedule
-# priority=3
-# autostart=true
-# autorestart=true
-# stdout_logfile=/home/frappe/frappe-bench/logs/schedule.log
-# stderr_logfile=/home/frappe/frappe-bench/logs/schedule.error.log
-# user=frappe
-# directory=/home/frappe/frappe-bench
-
-# [program:frappe-bench-frappe-default-worker]
-# command=/usr/bin/bench worker --queue default
-# priority=4
-# autostart=true
-# autorestart=true
-# stdout_logfile=/home/frappe/frappe-bench/logs/worker.log
-# stderr_logfile=/home/frappe/frappe-bench/logs/worker.error.log
-# user=frappe
-# stopwaitsecs=1560
-# directory=/home/frappe/frappe-bench
-# killasgroup=true
-# numprocs=1
-# process_name=%(program_name)s-%(process_num)d
-
-# [program:frappe-bench-frappe-short-worker]
-# command=/usr/bin/bench worker --queue short
-# priority=4
-# autostart=true
-# autorestart=true
-# stdout_logfile=/home/frappe/frappe-bench/logs/worker.log
-# stderr_logfile=/home/frappe/frappe-bench/logs/worker.error.log
-# user=frappe
-# stopwaitsecs=360
-# directory=/home/frappe/frappe-bench
-# killasgroup=true
-# numprocs=1
-# process_name=%(program_name)s-%(process_num)d
-
-# [program:frappe-bench-frappe-long-worker]
-# command=/usr/bin/bench worker --queue long
-# priority=4
-# autostart=true
-# autorestart=true
-# stdout_logfile=/home/frappe/frappe-bench/logs/worker.log
-# stderr_logfile=/home/frappe/frappe-bench/logs/worker.error.log
-# user=frappe
-# stopwaitsecs=1560
-# directory=/home/frappe/frappe-bench
-# killasgroup=true
-# numprocs=1
-# process_name=%(program_name)s-%(process_num)d
-
-
-# [group:frappe-bench-web]
-# programs=frappe-bench-frappe-web
-
-# [group:frappe-bench-workers]
-# programs=frappe-bench-frappe-schedule,frappe-bench-frappe-default-worker,frappe-bench-frappe-short-worker,frappe-bench-frappe-long-worker
-
-
-# supervisord --nodaemon -c /home/frappe/frappe-bench/config/supervisor.conf
-# bench setup production frappe
