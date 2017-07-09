@@ -15,6 +15,7 @@ TASK=$(case "$NODE_TYPE" in
   ("setup") echo "echo \"Setup Finished \" " ;;
   ("update") echo "/usr/bin/bench update --no-git" ;;
   ("backup") echo "/usr/bin/bench backup && echo \"Backup Finished \" " ;;
+  ("restore") echo "echo \"Restore Finished \" " ;;
   ("migrate") echo "/usr/bin/bench migrate" ;;
   ("scheduler") echo "/usr/bin/bench schedule" ;;
   ("worker-default") echo "/usr/bin/bench worker --queue default" ;;
@@ -31,6 +32,33 @@ if [ ${NODE_TYPE} = "setup" ]; then
   ls apps/ | while read -r file; do  if [ $file != "frappe" ]; then bench install-app $file; fi; done
 
 fi;
+
+if [ ${NODE_TYPE} = "restore" ]; then
+
+  cd /home/frappe/frappe-bench
+
+  i=1
+  for file in sites/localhost/private/backups/*
+  do
+      echo "$i $file"
+      i=$(($i+1))
+  done
+
+  read -p "Enter the number of file which you want to restore : " n
+
+  i=1
+  for file in sites/localhost/private/backups/*
+  do
+      if [ $n = $i ]; then
+        echo "You have choosed $i $file"
+        echo "Please wait ..."
+        bench --force restore $file
+      fi;
+      i=$(($i+1))
+  done
+
+fi;
+
 
 if [ ${NODE_TYPE} = "app" ]; then
 
