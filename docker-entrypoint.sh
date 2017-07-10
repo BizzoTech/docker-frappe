@@ -5,6 +5,10 @@ DB_HOST=${DB_HOST:=db}
 
 bench use localhost
 
+cd /home/frappe/frappe-bench
+ls apps/ | while read -r file; do  if [ $file != "frappe" ]; then ./env/bin/pip install -q -e apps/$file --no-cache-dir; fi; done && \
+
+
 echo 'Waiting for DB to start up'
 
 dockerize -wait tcp://db:3306 -timeout 120s
@@ -13,6 +17,7 @@ dockerize -wait tcp://db:3306 -timeout 120s
 TASK=$(case "$NODE_TYPE" in
   ("app") echo "/home/frappe/frappe-bench/env/bin/gunicorn -b 0.0.0.0:8000 -w 4 -t 120 frappe.app:application --preload" ;;
   ("setup") echo "echo \"Setup Finished \" " ;;
+  ("setup-apps") echo "echo \"Setup Finished \" " ;;
   ("update") echo "/usr/bin/bench update --no-git" ;;
   ("backup") echo "/usr/bin/bench backup && echo \"Backup Finished \" " ;;
   ("restore") echo "echo \"Restore Finished \" " ;;
@@ -29,6 +34,13 @@ if [ ${NODE_TYPE} = "setup" ]; then
 
   cd /home/frappe/frappe-bench
   bench reinstall && \
+  ls apps/ | while read -r file; do  if [ $file != "frappe" ]; then bench install-app $file; fi; done
+
+fi;
+
+if [ ${NODE_TYPE} = "setup-apps" ]; then
+
+  cd /home/frappe/frappe-bench
   ls apps/ | while read -r file; do  if [ $file != "frappe" ]; then bench install-app $file; fi; done
 
 fi;
