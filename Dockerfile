@@ -20,7 +20,7 @@ RUN git clone -b $BENCH_BRANCH --depth 1 https://github.com/BizzoTech/bench benc
     sudo bench setup sudoers $FRAPPE_USER && \                                   
     bench setup socketio && \                                   
     bench get-app frappe https://github.com/frappe/frappe --branch $FRAPPE_BRANCH && \
-    cd /home/$FRAPPE_USER/apps/frappe && npm install && \                            
+    cd /home/$FRAPPE_USER/frappe-bench/apps/frappe && npm install && \                            
     rm -rf /home/$FRAPPE_USER/bench-repo/.git && \                                   
     rm -rf /home/$FRAPPE_USER/frappe-bench/apps/frappe/.git                                   
                                    
