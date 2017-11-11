@@ -7,7 +7,7 @@ ENV BENCH_BRANCH master
 ENV FRAPPE_BRANCH v9.2.4
 
 RUN groupadd -r $FRAPPE_USER && \
-    useradd -r -g $FRAPPE_USER $FRAPPE_USER && \
+    useradd -r -m -g $FRAPPE_USER $FRAPPE_USER && \
     echo 'frappe ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers
 
 USER $FRAPPE_USER
