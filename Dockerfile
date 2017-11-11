@@ -6,11 +6,13 @@ ENV FRAPPE_USER frappe
 ENV BENCH_BRANCH master
 ENV FRAPPE_BRANCH v9.2.4
 
+ENV DEBIAN_FRONTEND="noninteractive"
+RUN apt-get update && apt-get install sudo
+
 RUN groupadd -r $FRAPPE_USER && \
     useradd -r -m -g $FRAPPE_USER $FRAPPE_USER && \
     echo 'frappe ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers
 
-RUN apt-get update && apt-get install sudo
 
 USER $FRAPPE_USER
 WORKDIR /home/$FRAPPE_USER
