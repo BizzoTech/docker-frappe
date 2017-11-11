@@ -10,6 +10,8 @@ RUN groupadd -r $FRAPPE_USER && \
     useradd -r -m -g $FRAPPE_USER $FRAPPE_USER && \
     echo 'frappe ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers
 
+RUN apt-get update && apt-get install sudo
+
 USER $FRAPPE_USER
 WORKDIR /home/$FRAPPE_USER
 RUN git clone -b $BENCH_BRANCH --depth 1 https://github.com/BizzoTech/bench bench-repo && \
