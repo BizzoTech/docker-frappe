@@ -23,7 +23,6 @@ RUN git clone -b $BENCH_BRANCH --depth 1 https://github.com/BizzoTech/bench benc
     bench get-app frappe https://github.com/frappe/frappe --branch $FRAPPE_BRANCH && \
     cd /home/$FRAPPE_USER/frappe-bench/apps/frappe && npm install && \
     cd /home/$FRAPPE_USER/frappe-bench && npm install babel-preset-env && \
-    cd /home/$FRAPPE_USER/frappe-bench && sudo pip install -e apps/frappe --no-cache-dir && \
     rm -rf /home/$FRAPPE_USER/bench-repo/.git && \
     rm -rf /home/$FRAPPE_USER/frappe-bench/apps/frappe/.git
 
