@@ -6,7 +6,7 @@ DB_HOST=${DB_HOST:=db}
 bench use localhost
 
 cd /home/frappe/frappe-bench
-ls apps/ | while read -r file; do  if [ $file != "frappe" ]; then .env/bin/pip install -q -e apps/$file --no-cache-dir; fi; done && \
+ls apps/ | while read -r file; do  if [ $file != "frappe" ]; then ./env/bin/pip install -q -e apps/$file --no-cache-dir; fi; done && \
 
 
 echo 'Waiting for DB to start up'
