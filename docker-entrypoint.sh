@@ -41,7 +41,7 @@ if [ ${NODE_TYPE} = "update" ]; then
 fi;
 
 if [ ${NODE_TYPE} = "setup" ]; then
-  bench reinstall && bench install-app erpnext && \
+  bench reinstall --yes && bench install-app erpnext && \
   ls apps/ | while read -r file; do  if [ $file != "frappe" ]; then bench install-app $file; fi; done
   echo "Setup Finished"
 fi;
